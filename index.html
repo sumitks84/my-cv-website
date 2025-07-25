@@ -207,9 +207,16 @@
                 <a href="#certs" class="text-slate-300 hover:text-sky-400 transition">Certifications</a>
                 <a href="#extra" class="text-slate-300 hover:text-sky-400 transition">Activities</a>
             </div>
-            <a href="#contact" class="hidden md:block bg-sky-500 text-white font-semibold px-5 py-2 rounded-lg hover:bg-sky-600 transition">
-                Contact
-            </a>
+            <div class="hidden md:flex items-center space-x-4">
+                <button id="listen-button" title="Listen to page description" class="bg-yellow-400 text-slate-900 font-semibold px-4 py-2 rounded-lg hover:bg-yellow-500 transition flex items-center space-x-2">
+                    <svg id="listen-icon-play" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
+                    <svg id="listen-icon-pause" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span>Listen</span>
+                </button>
+                <a href="#contact" class="bg-sky-500 text-white font-semibold px-5 py-2 rounded-lg hover:bg-sky-600 transition">
+                    Contact
+                </a>
+            </div>
             <div class="md:hidden">
                 <button id="mobile-menu-button" class="text-slate-300 focus:outline-none">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
@@ -693,6 +700,50 @@
                 closeModal();
             }
         }
+
+        // Accessibility Listen Feature
+        const listenButton = document.getElementById('listen-button');
+        const playIcon = document.getElementById('listen-icon-play');
+        const pauseIcon = document.getElementById('listen-icon-pause');
+        let utterance = null;
+
+        const accessibilityText = `
+            Welcome to the interactive portfolio of Sumit Kumar, a Software Developer and MBA Candidate at IIM Bodh Gaya. 
+            This page highlights his professional journey and skills.
+            You can navigate through sections for Experience, Skills, Projects, Education, Certifications, and Activities.
+            Many sections are interactive. Hovering or tapping on the cards will flip them to reveal more details.
+            The contact section at the bottom provides links to Sumit's social profiles and email.
+        `;
+
+        function togglePlayback() {
+            if (speechSynthesis.speaking && !speechSynthesis.paused) {
+                speechSynthesis.pause();
+                playIcon.classList.remove('hidden');
+                pauseIcon.classList.add('hidden');
+            } else if (speechSynthesis.paused) {
+                speechSynthesis.resume();
+                playIcon.classList.add('hidden');
+                pauseIcon.classList.remove('hidden');
+            } else {
+                utterance = new SpeechSynthesisUtterance(accessibilityText);
+                utterance.onend = () => {
+                    playIcon.classList.remove('hidden');
+                    pauseIcon.classList.add('hidden');
+                };
+                speechSynthesis.cancel(); // Cancel any previous speech
+                speechSynthesis.speak(utterance);
+                playIcon.classList.add('hidden');
+                pauseIcon.classList.remove('hidden');
+            }
+        }
+
+        listenButton.addEventListener('click', togglePlayback);
+
+        // Stop speech when leaving the page
+        window.onbeforeunload = () => {
+            speechSynthesis.cancel();
+        };
+
     </script>
 </body>
 </html>
